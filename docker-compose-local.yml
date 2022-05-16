@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  cron:
+    container_name: "cron"
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    env_file: .env
+    volumes:
+      - ./logs:/home/appuser/cron/logs
+      - ./tests/data/drs2dev/drsfs/dropbox:/home/appuser/dropbox
+    networks:
+      - drsts-net
+
+networks:
+  drsts-net:
+    name: "drsts-net"

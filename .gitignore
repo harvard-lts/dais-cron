@@ -1,0 +1,16 @@
+# Editor configs
+*.editorconfig
+.project
+.pydevproject
+.vscode/
+.idea
+
+# Environment variables
+.env
+
+# Logs
+*.log
+/logs/*
+!/logs/.keep
+
+node_modules/
