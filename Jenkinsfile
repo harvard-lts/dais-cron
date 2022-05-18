@@ -260,7 +260,7 @@ pipeline {
     imageName = 'cron'
     stackName = 'HDC3A'
     // projName is the directory name for the project on the servers for it's docker/config files
-    projName = 'cron'
+    projName = 'hdc3a'
     registryCredentialsId = "${env.REGISTRY_ID}"
     registryUri = 'https://registry.lts.harvard.edu'
    }
