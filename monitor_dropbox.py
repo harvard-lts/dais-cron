@@ -36,12 +36,11 @@ def collect_loadreports():
 
 def notify_dts_loadreports(filename):
     logging.debug("Calling DTS /loadreport for file: " + filename)
-    # Commented out because endpoint doesn't exist yet
-    # requests.get(dts_endpoint + '/loadreport?filename=' + filename)
+    requests.get(dts_endpoint + '/loadreport?filename=' + filename)
 
 
 def collect_failed_batch():
-    failed_batch_files = []
+    failed_batch = []
     failed_batch_dir = dropbox_root_dir + dropbox_name + "/incoming"
     logging.debug("Checking failed batches in loc: " + failed_batch_dir)
 
@@ -49,15 +48,14 @@ def collect_failed_batch():
         for name in files:
             if re.match("batch.xml.failed", name):
                 split_path = root.split("/")
-                failed_batch_files.append(split_path.pop())
+                failed_batch.append(split_path.pop())
 
-    return failed_batch_files
+    return failed_batch
 
 
-def notify_dts_failed_batch(filename):
-    logging.debug("Calling DTS for filed batch: " + filename)
-    # Commented out because endpoint doesn't exist yet
-    # requests.get(dts_endpoint + '/loadreport?filename=' + filename)
+def notify_dts_failed_batch(batch_name):
+    logging.debug("Calling DTS for filed batch: " + batch_name)
+    requests.get(dts_endpoint + '/failedBatch?batchName=' + batch_name)
 
 
 def main():
