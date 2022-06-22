@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
+import logging
+import os
+import re
 import sys
 import traceback
 from datetime import datetime
-import logging, re
-import os
 
-import requests
+from requests import exceptions, get, HTTPError
 
 DATEFORMAT = '%Y-%m-%d %H:%M:%S'
 relative_dir = os.path.dirname(os.path.realpath(__file__))
@@ -20,6 +21,7 @@ dropbox_root_dir = os.environ.get('DROPBOX_PATH')
 dropbox_name = os.environ.get('DROPBOX_NAME')
 
 logging.debug("Executing monitor_dropbox.py")
+
 
 def collect_loadreports():
     loadreport_files = []
@@ -36,7 +38,12 @@ def collect_loadreports():
 
 def notify_dts_loadreports(filename):
     logging.debug("Calling DTS /loadreport for file: " + filename)
-    requests.get(dts_endpoint + '/loadreport?filename=' + filename)
+    try:
+        response = get(dts_endpoint + '/loadreport?filename=' + filename)
+        logging.debug("Response status code for '/loadreport?filename='" + filename + ": " + response.status_code)
+        response.raise_for_status()
+    except (exceptions.ConnectionError, HTTPError) as e:
+        logging.error("Error when calling DTS /loadreport for file: " + str(e))
 
 
 def collect_failed_batch():
@@ -54,8 +61,13 @@ def collect_failed_batch():
 
 
 def notify_dts_failed_batch(batch_name):
-    logging.debug("Calling DTS for filed batch: " + batch_name)
-    requests.get(dts_endpoint + '/failedBatch?batchName=' + batch_name)
+    logging.debug("Calling DTS for failed batch: " + batch_name)
+    try:
+        response = get(dts_endpoint + '/failedBatch?batchName=' + batch_name)
+        logging.debug("Response status code for '/failedBatch?batchName='" + batch_name + ": " + response.status_code)
+        response.raise_for_status()
+    except (exceptions.ConnectionError, HTTPError) as e:
+        logging.error("Error when calling DTS /loadreport for file: " + str(e))
 
 
 def main():
