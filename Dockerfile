@@ -20,11 +20,11 @@ RUN chown appuser:appuser -R /home/appuser && \
 USER appuser
 
 # Append SAN section to openssl.cnf and generate a new self-signed certificate and key
-RUN mkdir -p /home/node/ssl/certs && \
-    cp /etc/ssl/openssl.cnf /home/node/ssl/openssl.cnf && \
-    printf "[SAN]\nsubjectAltName=DNS:*.hul.harvard.edu,DNS:*.lts.harvard.edu" >> /home/node/ssl/openssl.cnf && \
-    openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/C=US/ST=Massachusetts/L=Cambridge/O=Library Technology Services/CN=*.lib.harvard.edu" -extensions SAN -reqexts SAN -config /home/node/ssl/openssl.cnf -keyout /home/node/ssl/certs/server.key -out /home/node/ssl/certs/server.crt && \
-    mkdir -p /home/node/app
+RUN mkdir -p /home/appuser/ssl/certs && \
+    cp /etc/ssl/openssl.cnf /home/appuser/ssl/openssl.cnf && \
+    printf "[SAN]\nsubjectAltName=DNS:*.hul.harvard.edu,DNS:*.lts.harvard.edu" >> /home/appuser/ssl/openssl.cnf && \
+    openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 -subj "/C=US/ST=Massachusetts/L=Cambridge/O=Library Technology Services/CN=*.lib.harvard.edu" -extensions SAN -reqexts SAN -config /home/appuser/ssl/openssl.cnf -keyout /home/appuser/ssl/certs/server.key -out /home/appuser/ssl/certs/server.crt && \
+    mkdir -p /home/appuser/app
 
 RUN npm install && \
     python3 -m pip install -r requirements.txt && \
