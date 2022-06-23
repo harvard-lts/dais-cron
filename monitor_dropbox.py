@@ -40,7 +40,7 @@ def notify_dts_loadreports(filename):
     logging.debug("Calling DTS /loadreport for file: " + filename)
     try:
         response = get(dts_endpoint + '/loadreport?filename=' + filename, verify=False)
-        logging.debug("Response status code for '/loadreport?filename='" + filename + ": " + response.status_code)
+        logging.debug("Response status code for '/loadreport?filename='" + filename + ": " + str(response.status_code))
         response.raise_for_status()
     except Exception as e:
         logging.error("Error when calling DTS /loadreport for file: " + str(e))
@@ -64,7 +64,7 @@ def notify_dts_failed_batch(batch_name):
     logging.debug("Calling DTS for failed batch: " + batch_name)
     try:
         response = get(dts_endpoint + '/failedBatch?batchName=' + batch_name, verify=False)
-        logging.debug("Response status code for '/failedBatch?batchName='" + batch_name + ": " + response.status_code)
+        logging.debug("Response status code for '/failedBatch?batchName='" + batch_name + ": " + str(response.status_code))
         response.raise_for_status()
     except Exception as e:
         logging.error("Error when calling DTS /loadreport for file: " + str(e))
@@ -75,13 +75,13 @@ def main():
     loadreport_list = collect_loadreports()
     logging.debug("Load report files returned: " + str(loadreport_list))
     for loadreport in loadreport_list:
-        notify_dts_loadreports(str(loadreport))
+        notify_dts_loadreports(loadreport)
 
     # Collect failed ingests
     failed_batch_list = collect_failed_batch()
     logging.debug("Failed batch files returned: " + str(failed_batch_list))
     for failed_batch in failed_batch_list:
-        notify_dts_failed_batch(str(failed_batch))
+        notify_dts_failed_batch(failed_batch)
 
 
 try:
