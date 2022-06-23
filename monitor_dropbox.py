@@ -39,8 +39,8 @@ def collect_loadreports():
 def notify_dts_loadreports(filename):
     logging.debug("Calling DTS /loadreport for file: " + filename)
     try:
-        response = get(dts_endpoint + '/loadreport?filename=' + filename)
-        logging.debug("Response status code for '/loadreport?filename='" + filename + ": " + response.status_code)
+        response = get(dts_endpoint + '/loadreport?filename=' + filename, verify=False)
+        logging.debug("Response status code for '/loadreport?filename='" + filename + ": " + str(response.status_code))
         response.raise_for_status()
     except (exceptions.ConnectionError, HTTPError) as e:
         logging.error("Error when calling DTS /loadreport for file: " + str(e))
@@ -63,8 +63,8 @@ def collect_failed_batch():
 def notify_dts_failed_batch(batch_name):
     logging.debug("Calling DTS for failed batch: " + batch_name)
     try:
-        response = get(dts_endpoint + '/failedBatch?batchName=' + batch_name)
-        logging.debug("Response status code for '/failedBatch?batchName='" + batch_name + ": " + response.status_code)
+        response = get(dts_endpoint + '/failedBatch?batchName=' + batch_name, verify=False)
+        logging.debug("Response status code for '/failedBatch?batchName='" + batch_name + ": " + str(response.status_code))
         response.raise_for_status()
     except (exceptions.ConnectionError, HTTPError) as e:
         logging.error("Error when calling DTS /loadreport for file: " + str(e))
