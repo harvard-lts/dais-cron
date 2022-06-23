@@ -75,13 +75,13 @@ def main():
     loadreport_list = collect_loadreports()
     logging.debug("Load report files returned: " + str(loadreport_list))
     for loadreport in loadreport_list:
-        notify_dts_loadreports(loadreport)
+        notify_dts_loadreports(str(loadreport))
 
     # Collect failed ingests
     failed_batch_list = collect_failed_batch()
     logging.debug("Failed batch files returned: " + str(failed_batch_list))
     for failed_batch in failed_batch_list:
-        notify_dts_failed_batch(failed_batch)
+        notify_dts_failed_batch(str(failed_batch))
 
 
 try:
