@@ -16,7 +16,7 @@ Docker Compose
 ## Local Development Environment Setup Instructions
 
 ### 1: Clone the repository to a local directory
-```git clone git@github.huit.harvard.edu:LTS/hdc3a-cron.git```
+```git clone git@github.huit.harvard.edu:LTS/dais-cron.git```
 
 ### 2: Create app config
 
