@@ -1,4 +1,4 @@
-# hdc3a-cron
+# dais-cron
 The cron container for monitoring the DRS dropbox for LOADREPROT files
 
 * log files are in the `logs` subdirectory
