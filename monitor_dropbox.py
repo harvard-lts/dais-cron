@@ -27,7 +27,7 @@ logging.debug("Executing monitor_dropbox.py")
 def collect_loadreports():
     loadreport_files = []
     for dropbox in dropbox_list:
-        loadreport_dir = dropbox_root_dir + "/lts_load_reports" + dropbox + "/incoming"
+        loadreport_dir = os.path.join(dropbox_root_dir, "lts_load_reports", dropbox, "incoming")
         logging.debug("Checking for load reports in dropbox loc: " + loadreport_dir)
 
         for root, dirs, files in os.walk(loadreport_dir):
@@ -51,7 +51,7 @@ def notify_dts_loadreports(filename):
 def collect_failed_batch():
     failed_batch = []
     for dropbox in dropbox_list:
-        failed_batch_dir = dropbox_root_dir + dropbox + "/incoming"
+        failed_batch_dir = os.path.join(dropbox_root_dir, dropbox, "incoming")
         logging.debug("Checking failed batches in loc: " + failed_batch_dir)
 
         for root, dirs, files in os.walk(failed_batch_dir):

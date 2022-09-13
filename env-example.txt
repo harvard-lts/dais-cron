@@ -21,4 +21,4 @@ DTS_ENDPOINT=https://ltsds-cloud-dev-1.lib.harvard.edu:10581
 
 # Dropboxes
 BASE_DROPBOX_PATH=/home/appuser/dropbox
-DROPBOX_DIRS=/dvndev, /epadddev_secure
+DROPBOX_DIRS=dvndev, epadddev_secure
