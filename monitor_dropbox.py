@@ -19,7 +19,7 @@ logging.basicConfig(filename=logname_template.format(datetime.today().strftime("
 dts_endpoint = os.environ.get('DTS_ENDPOINT')
 dropbox_root_dir = os.environ.get('BASE_DROPBOX_PATH')
 dropbox_dirs = os.environ.get('DROPBOX_DIRS')
-dropbox_list = dropbox_dirs.split(",")
+dropbox_list = dropbox_dirs.replace(" ", "").split(",")
 
 logging.debug("Executing monitor_dropbox.py")
 
