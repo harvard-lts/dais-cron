@@ -17,21 +17,23 @@ logging.basicConfig(filename=logname_template.format(datetime.today().strftime("
                     level=logging.DEBUG)
 
 dts_endpoint = os.environ.get('DTS_ENDPOINT')
-dropbox_root_dir = os.environ.get('DROPBOX_PATH')
-dropbox_name = os.environ.get('DROPBOX_NAME')
+dropbox_root_dir = os.environ.get('BASE_DROPBOX_PATH')
+dropbox_dirs = os.environ.get('DROPBOX_DIRS')
+dropbox_list = dropbox_dirs.split(",")
 
 logging.debug("Executing monitor_dropbox.py")
 
 
 def collect_loadreports():
     loadreport_files = []
-    loadreport_dir = dropbox_root_dir + "/lts_load_reports" + dropbox_name + "/incoming"
-    logging.debug("Checking for load reports in dropbox loc: " + loadreport_dir)
+    for dropbox in dropbox_list:
+        loadreport_dir = dropbox_root_dir + "/lts_load_reports" + dropbox + "/incoming"
+        logging.debug("Checking for load reports in dropbox loc: " + loadreport_dir)
 
-    for root, dirs, files in os.walk(loadreport_dir):
-        for name in files:
-            if re.match("LOADREPORT", name):
-                loadreport_files.append(name)
+        for root, dirs, files in os.walk(loadreport_dir):
+            for name in files:
+                if re.match("LOADREPORT", name):
+                    loadreport_files.append(name)
 
     return loadreport_files
 
@@ -48,14 +50,15 @@ def notify_dts_loadreports(filename):
 
 def collect_failed_batch():
     failed_batch = []
-    failed_batch_dir = dropbox_root_dir + dropbox_name + "/incoming"
-    logging.debug("Checking failed batches in loc: " + failed_batch_dir)
+    for dropbox in dropbox_list:
+        failed_batch_dir = dropbox_root_dir + dropbox + "/incoming"
+        logging.debug("Checking failed batches in loc: " + failed_batch_dir)
 
-    for root, dirs, files in os.walk(failed_batch_dir):
-        for name in files:
-            if re.match("batch.xml.failed", name):
-                split_path = root.split("/")
-                failed_batch.append(split_path.pop())
+        for root, dirs, files in os.walk(failed_batch_dir):
+            for name in files:
+                if re.match("batch.xml.failed", name):
+                    split_path = root.split("/")
+                    failed_batch.append(split_path.pop())
 
     return failed_batch
 
