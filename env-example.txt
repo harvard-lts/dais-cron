@@ -16,9 +16,27 @@ MONTH=*
 # (0 to 6 are Sunday to Saturday; 7 is Sunday, the same as 0)
 DAY_OF_WEEK=*
 
+# Cron Interval Settings
+# (optional) second (0 - 59)
+DROPBOX_SECOND=*
+# minute (0 - 59)
+DROPBOX_MINUTE=*
+# hour (0 - 23)
+DROPBOX_HOUR=*
+# day of month (1 - 31)
+DROPBOX_DAY=*
+# month (1 - 12, JAN-DEC)
+DROPBOX_MONTH=*
+# day of week (0 - 6, SUN-Mon)
+# (0 to 6 are Sunday to Saturday; 7 is Sunday, the same as 0)
+DROPBOX_DAY_OF_WEEK=*
+
 # DTS
 DTS_ENDPOINT=https://ltsds-cloud-dev-1.lib.harvard.edu:10581
 
 # Dropboxes
 BASE_DROPBOX_PATH=/home/appuser/dropbox
 DROPBOX_DIRS=dvndev, epadddev_secure
+
+#Set to true when running locally so notifications don't get sent
+TESTING=False
