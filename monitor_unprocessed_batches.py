@@ -45,7 +45,7 @@ def notify_dts_unprocessed_batches(unprocessed_data_path, application_name, admi
         admin_metadata_json = json.dumps(admin_metadata)
         payload = {"unprocessed_data_path": unprocessed_data_path, "application_name": application_name, "admin_metadata": admin_metadata_json}
         response = get(dts_endpoint + '/reprocess_batch', data=payload, verify=False)
-        logging.debug("Response status code for '/reprocess_batch?batchname='" + filename + ": " + str(response.status_code))
+        logging.debug("Response status code for '/reprocess_batch: " + str(response.status_code))
         response.raise_for_status()
     except (exceptions.ConnectionError, HTTPError) as e:
         logging.error("Error when calling DTS /reprocess_batch for batch: " + str(e))
