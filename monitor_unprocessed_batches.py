@@ -40,7 +40,7 @@ def collect_unprocessed_batches():
 
 
 def notify_dts_unprocessed_batches(unprocessed_data_path, application_name, admin_metadata):
-    logging.debug("Calling DTS /reprocess_batch for file: " + batchname)
+    logging.debug("Calling DTS /reprocess_batch for file: " + unprocessed_data_path)
     try:
         admin_metadata_json = json.dumps(admin_metadata)
         payload = {"unprocessed_data_path": unprocessed_data_path, "application_name": application_name, "admin_metadata": admin_metadata_json}
