@@ -39,10 +39,12 @@ def collect_unprocessed_batches():
     return unprocessed_batches
 
 
-def notify_dts_unprocessed_batches(batchname):
+def notify_dts_unprocessed_batches(unprocessed_data_path, application_name, admin_metadata):
     logging.debug("Calling DTS /reprocess_batch for file: " + batchname)
     try:
-        response = get(dts_endpoint + '/reprocess_batch?batchname=' + batchname, verify=False)
+        admin_metadata_json = json.dumps(admin_metadata)
+        payload = {"unprocessed_data_path": unprocessed_data_path, "application_name": application_name, "admin_metadata": admin_metadata_json}
+        response = get(dts_endpoint + '/reprocess_batch', data=payload, verify=False)
         logging.debug("Response status code for '/reprocess_batch?batchname='" + filename + ": " + str(response.status_code))
         response.raise_for_status()
     except (exceptions.ConnectionError, HTTPError) as e:
@@ -64,12 +66,61 @@ def main():
         dropbox_name = batch_as_array[-3]
         if re.match("dvn", dropbox_name):
             application_name = "Dataverse"
+            admin_metadata = {"dropbox_name": dropbox_name}
         else:
             application_name = "ePADD"
+            drs_config_path = os.path.join(batch_path, "drsConfig.txt")
+            admin_metadata = parse_drsconfig_metadata(drs_config_path)
+            #If errors were caught while trying to parse the drsConfig file
+            #then move to the next unprocessed batch
+            if not admin_metadata:
+                continue
+            admin_metadata["dropbox_name"] = dropbox_name
+            
         if testing == "False":
-            notify_dts_unprocessed_batches(batch_path)
+            notify_dts_unprocessed_batches(package_id, batch_path, application_name, admin_metadata)
 
+def parse_drsconfig_metadata(drs_config_path):
+    admin_metadata = {}
+    try:
+        #This will throw an error if the file is missing which is handled in the try-except
+        with open(drs_config_path, 'r', encoding='UTF-8') as file:
+            metadata = file.read().splitlines()
+            metadata_dict = {}
+            for val in metadata:
+                if len(val) > 0:
+                    split_val = val.split('=')
+                    metadata_dict[split_val[0]] = split_val[1]
+            
+            try:
+                #This will throw an error if any key is missing and is handled in the try-except
+                admin_metadata = {        
+                    "accessFlag": metadata_dict["accessFlag"],
+                    "contentModel": metadata_dict["contentModel"],
+                    "depositingSystem": metadata_dict["depositingSystem"],
+                    "firstGenerationInDrs": metadata_dict["firstGenerationInDrs"],
+                    "objectRole": metadata_dict["objectRole"],
+                    "usageClass": metadata_dict["usageClass"],
+                    "storageClass": metadata_dict["storageClass"],
+                    "ownerCode": metadata_dict["ownerCode"],
+                    "billingCode": metadata_dict["billingCode"],
+                    "resourceNamePattern": metadata_dict["resourceNamePattern"],
+                    "urnAuthorityPath": metadata_dict["urnAuthorityPath"],
+                    "depositAgent": metadata_dict["depositAgent"],
+                    "depositAgentEmail": metadata_dict["depositAgentEmail"],
+                    "successEmail": metadata_dict["successEmail"],
+                    "failureEmail": metadata_dict["failureEmail"],
+                    "successMethod": metadata_dict["successMethod"],
+                    "adminCategory": metadata_dict["adminCategory"]
+                }
+            except KeyError as err:
+                logging.error("Missing a key in {} file: " + str(err) + "".format(drs_config_path))
 
+    except FileNotFoundError as err:
+        logging.error("drsConfig.txt does not exist {}: " + str(err) + "".format(drs_config_path))
+    
+    return admin_metadata
+        
 if __name__ == "__main__":
     try:
         main()
