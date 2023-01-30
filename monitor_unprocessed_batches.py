@@ -90,7 +90,7 @@ def main():
                 admin_metadata["dropbox_name"] = dropbox_name
                 
             if testing == "False":
-                notify_dts_unprocessed_batches(package_id, batch_path, application_name, admin_metadata)
+                notify_dts_unprocessed_batches(batch_path, application_name, admin_metadata)
 
 def parse_drsconfig_metadata(drs_config_path):
     admin_metadata = {}
