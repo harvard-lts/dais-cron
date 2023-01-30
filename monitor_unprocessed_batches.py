@@ -5,7 +5,7 @@ import os
 import os.path
 import re
 import sys
-import traceback
+import traceback, time
 from datetime import datetime
 
 from requests import exceptions, get, HTTPError
@@ -58,27 +58,39 @@ def main():
     logging.debug("Unprocessed batches")
     unprocessed_batches_list = collect_unprocessed_batches()
     logging.debug("Unprocessed batches returned: " + str(unprocessed_batches_list))
+    
+    threshold = int(os.environ.get("UNPROCESSED_CHECK_THRESHOLD", 86400))
+    seconds_from_now = time.time() - threshold
+    logging.debug("Threshold seconds from now: " + str(seconds_from_now))
+    
     for batch_path in unprocessed_batches_list:
-        destination_path = batch_path
-        package_id = os.path.basename(batch_path)
-        admin_metadata = {}
-        batch_as_array = batch.path.split("/")
-        dropbox_name = batch_as_array[-3]
-        if re.match("dvn", dropbox_name):
-            application_name = "Dataverse"
-            admin_metadata = {"dropbox_name": dropbox_name}
-        else:
-            application_name = "ePADD"
-            drs_config_path = os.path.join(batch_path, "drsConfig.txt")
-            admin_metadata = parse_drsconfig_metadata(drs_config_path)
-            #If errors were caught while trying to parse the drsConfig file
-            #then move to the next unprocessed batch
-            if not admin_metadata:
-                continue
-            admin_metadata["dropbox_name"] = dropbox_name
-            
-        if testing == "False":
-            notify_dts_unprocessed_batches(package_id, batch_path, application_name, admin_metadata)
+        logging.debug("Inspecting: " + batch_path)
+        create_time = os.stat(batch_path).st_ctime
+        logging.debug("Create time in seconds: " + str(create_time))
+        
+        #If the create time was more than the given threshold then reprocess it.
+        if (seconds_from_now >= create_time):
+            logging.debug("Reprocessing: " + batch_path)
+            destination_path = batch_path
+            package_id = os.path.basename(batch_path)
+            admin_metadata = {}
+            batch_as_array = batch_path.split("/")
+            dropbox_name = batch_as_array[-3]
+            if re.match("dvn", dropbox_name):
+                application_name = "Dataverse"
+                admin_metadata = {"dropbox_name": dropbox_name}
+            else:
+                application_name = "ePADD"
+                drs_config_path = os.path.join(batch_path, "drsConfig.txt")
+                admin_metadata = parse_drsconfig_metadata(drs_config_path)
+                #If errors were caught while trying to parse the drsConfig file
+                #then move to the next unprocessed batch
+                if not admin_metadata:
+                    continue
+                admin_metadata["dropbox_name"] = dropbox_name
+                
+            if testing == "False":
+                notify_dts_unprocessed_batches(package_id, batch_path, application_name, admin_metadata)
 
 def parse_drsconfig_metadata(drs_config_path):
     admin_metadata = {}
@@ -114,10 +126,10 @@ def parse_drsconfig_metadata(drs_config_path):
                     "adminCategory": metadata_dict["adminCategory"]
                 }
             except KeyError as err:
-                logging.error("Missing a key in {} file: " + str(err) + "".format(drs_config_path))
+                logging.error("Missing a key in " + drs_config_path +" file: " + str(err))
 
     except FileNotFoundError as err:
-        logging.error("drsConfig.txt does not exist {}: " + str(err) + "".format(drs_config_path))
+        logging.error("drsConfig.txt does not exist for path: "+ drs_config_path)
     
     return admin_metadata
         
