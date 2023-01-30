@@ -21,6 +21,7 @@ USER appuser
 
 RUN npm install && \
     python3 -m pip install -r requirements.txt && \
-    chmod +x /home/appuser/cron/monitor_dropbox.py
+    chmod +x /home/appuser/cron/monitor_dropbox.py && \
+    chmod +x /home/appuser/cron/monitor_unprocessed_batches.py
 
 CMD ["node", "./cron.js"]

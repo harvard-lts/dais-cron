@@ -2,6 +2,7 @@
 
 import logging
 import os
+import os.path
 import re
 import sys
 import traceback
@@ -20,6 +21,7 @@ dts_endpoint = os.environ.get('DTS_ENDPOINT')
 dropbox_root_dir = os.environ.get('BASE_DROPBOX_PATH')
 dropbox_dirs = os.environ.get('DROPBOX_DIRS')
 dropbox_list = dropbox_dirs.replace(" ", "").split(",")
+testing = os.environ.get("TESTING", "False")
 
 logging.debug("Executing monitor_dropbox.py")
 
@@ -27,7 +29,7 @@ logging.debug("Executing monitor_dropbox.py")
 def collect_loadreports():
     loadreport_files = []
     for dropbox in dropbox_list:
-        loadreport_dir = dropbox_root_dir + "/lts_load_reports" + dropbox + "/incoming"
+        loadreport_dir = os.path.join(dropbox_root_dir, "lts_load_reports", dropbox, "incoming")
         logging.debug("Checking for load reports in dropbox loc: " + loadreport_dir)
 
         for root, dirs, files in os.walk(loadreport_dir):
@@ -51,7 +53,7 @@ def notify_dts_loadreports(filename):
 def collect_failed_batch():
     failed_batch = []
     for dropbox in dropbox_list:
-        failed_batch_dir = dropbox_root_dir + dropbox + "/incoming"
+        failed_batch_dir = os.path.join(dropbox_root_dir, dropbox, "incoming")
         logging.debug("Checking failed batches in loc: " + failed_batch_dir)
 
         for root, dirs, files in os.walk(failed_batch_dir):
@@ -78,18 +80,20 @@ def main():
     loadreport_list = collect_loadreports()
     logging.debug("Load report files returned: " + str(loadreport_list))
     for loadreport in loadreport_list:
-        notify_dts_loadreports(loadreport)
+        if testing == "False":
+            notify_dts_loadreports(loadreport)
 
     # Collect failed ingests
     failed_batch_list = collect_failed_batch()
     logging.debug("Failed batch files returned: " + str(failed_batch_list))
     for failed_batch in failed_batch_list:
-        notify_dts_failed_batch(failed_batch)
+        if testing == "False":
+            notify_dts_failed_batch(failed_batch)
 
-
-try:
-    main()
-    sys.exit(0)
-except Exception as e:
-    traceback.print_exc()
-    sys.exit(1)
+if __name__ == "__main__":
+    try:
+        main()
+        sys.exit(0)
+    except Exception as e:
+        traceback.print_exc()
+        sys.exit(1)
