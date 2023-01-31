@@ -42,4 +42,5 @@ DROPBOX_DIRS=dvndev, epadddev_secure
 TESTING=False
 
 #Check for batches after X seconds (1 day default = 86400)
+#Use -1 to collect all unprocessed batches
 UNPROCESSED_CHECK_THRESHOLD=86400
