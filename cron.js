@@ -35,3 +35,26 @@ Cron(interval, {}, ()=> {
   }
 
 });
+
+//Set cron intervals
+dropbox_second = process.env.DROPBOX_SECOND
+dropbox_minute = process.env.DROPBOX_MINUTE
+dropbox_hour = process.env.DROPBOX_HOUR
+dropbox_day = process.env.DROPBOX_DAY
+dropbox_month = process.env.DROPBOX_MONTH
+dropbox_day_of_week = process.env.DROPBOX_DAY_OF_WEEK
+dropbox_interval = `${dropbox_second} ${dropbox_minute} ${dropbox_hour} ${dropbox_day} ${dropbox_month} ${dropbox_day_of_week}`
+	
+Cron(dropbox_interval, {}, ()=> {
+  console.log("checking missed exports in dropbox");
+
+  try {
+    subprocess = spawn("/home/appuser/cron/monitor_unprocessed_batches.py")
+    subprocess.stdout.on('data', (data) => { console.log(data.toString()) });
+    subprocess.stderr.on('data', (data) => { console.log("ERR: " + data) });
+  }
+  catch (e) {
+    console.log(e);
+  }
+
+});

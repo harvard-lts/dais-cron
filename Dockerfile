@@ -8,7 +8,8 @@ RUN DEBIAN_FRONTEND=non-interactive && \
     apt-get -y install software-properties-common gcc && \
     apt-get -y install python3 python3-pip python3-distutils python3-apt && \
     groupadd -r -g 55020 appuser && \
-    useradd -u 55020 -g 55020 --create-home appuser
+    groupadd -r -g 4177 epadd_secure && \
+    useradd -u 55020 -g 55020 -G 4177 --create-home appuser
 
 WORKDIR /home/appuser/cron
 
@@ -21,6 +22,7 @@ USER appuser
 
 RUN npm install && \
     python3 -m pip install -r requirements.txt && \
-    chmod +x /home/appuser/cron/monitor_dropbox.py
+    chmod +x /home/appuser/cron/monitor_dropbox.py && \
+    chmod +x /home/appuser/cron/monitor_unprocessed_batches.py
 
 CMD ["node", "./cron.js"]

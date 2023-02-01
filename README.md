@@ -56,3 +56,19 @@ This command stops and removes all containers specified in the docker-compose-lo
 ```
 docker-compose -f docker-compose-local.yml down
 ```
+
+## Testing
+
+1. Start the container up as described in the <b>Local Development Environment Setup Instructions</b> instructions.
+
+2. Exec into the container:
+
+```
+docker exec -it cron bash
+```
+
+3. Run the tests
+
+```
+python3 -m pytest
+```
