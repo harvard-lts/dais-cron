@@ -68,7 +68,7 @@ def main():
     unprocessed_batches_list = collect_unprocessed_batches()
     logging.debug("Unprocessed batches returned: " + str(unprocessed_batches_list))
 
-    if testing == "False":
+    if testing == "False" and unprocessed_batches_list:
         notify_dts_unprocessed_batches(unprocessed_batches_list)
 
 
