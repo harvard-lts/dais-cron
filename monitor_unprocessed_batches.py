@@ -6,7 +6,6 @@ import os.path
 import sys
 import traceback
 import time
-import json
 from datetime import datetime
 
 from requests import exceptions, get, HTTPError
@@ -53,8 +52,7 @@ def collect_unprocessed_batches():
 def notify_dts_unprocessed_batches(unprocessed_batches_list):
     logging.debug("Calling DTS /reprocess_batches")
     try:
-        unprocessed_batches_list_json = json.dumps(unprocessed_batches_list)
-        payload = {"unprocessed_exports": unprocessed_batches_list_json}
+        payload = {"unprocessed_exports": unprocessed_batches_list}
         response = get(dts_endpoint + '/reprocess_batches', params=payload, verify=False)
         logging.debug("Response status code for '/reprocess_batches: " + str(response.status_code))
         response.raise_for_status()
