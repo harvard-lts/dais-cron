@@ -27,8 +27,9 @@ logging.debug("Executing monitor_dropbox.py")
 
 
 def collect_loadreports():
-    loadreport_files = []
+    loadreports = {}
     for dropbox in dropbox_list:
+        loadreport_files = []
         loadreport_dir = os.path.join(dropbox_root_dir, "lts_load_reports", dropbox, "incoming")
         logging.debug("Checking for load reports in dropbox loc: " + loadreport_dir)
 
@@ -36,14 +37,16 @@ def collect_loadreports():
             for name in files:
                 if re.match("LOADREPORT", name):
                     loadreport_files.append(name)
+        if loadreport_files:
+            loadreports[dropbox] = loadreport_files
+    return loadreports
 
-    return loadreport_files
 
-
-def notify_dts_loadreports(filename):
+def notify_dts_loadreports(filename, dropbox):
     logging.debug("Calling DTS /loadreport for file: " + filename)
     try:
-        response = get(dts_endpoint + '/loadreport?filename=' + filename, verify=False)
+        url = dts_endpoint + "/loadreport?filename={}&dropbox={}".format(filename, dropbox)
+        response = get(url, verify=False)
         logging.debug("Response status code for '/loadreport?filename='" + filename + ": " + str(response.status_code))
         response.raise_for_status()
     except (exceptions.ConnectionError, HTTPError) as e:
@@ -51,8 +54,9 @@ def notify_dts_loadreports(filename):
 
 
 def collect_failed_batch():
-    failed_batch = []
+    failed_batches = {}
     for dropbox in dropbox_list:
+        failed_batch_list = []
         failed_batch_dir = os.path.join(dropbox_root_dir, dropbox, "incoming")
         logging.debug("Checking failed batches in loc: " + failed_batch_dir)
 
@@ -60,15 +64,18 @@ def collect_failed_batch():
             for name in files:
                 if re.match("batch.xml.failed", name):
                     split_path = root.split("/")
-                    failed_batch.append(split_path.pop())
+                    failed_batch_list.append(split_path.pop())
+        if failed_batch_list:
+            failed_batches[dropbox] = failed_batch_list
 
-    return failed_batch
+    return failed_batches
 
 
-def notify_dts_failed_batch(batch_name):
+def notify_dts_failed_batch(batch_name, dropbox):
     logging.debug("Calling DTS for failed batch: " + batch_name)
     try:
-        response = get(dts_endpoint + '/failedBatch?batchName=' + batch_name, verify=False)
+        url = dts_endpoint + "/failedBatch?batchName={}&dropbox={}".format(batch_name, dropbox)
+        response = get(url, verify=False)
         logging.debug("Response status code for '/failedBatch?batchName='" + batch_name + ": " + str(response.status_code))
         response.raise_for_status()
     except (exceptions.ConnectionError, HTTPError) as e:
@@ -77,18 +84,22 @@ def notify_dts_failed_batch(batch_name):
 
 def main():
     # Collect successful ingests
-    loadreport_list = collect_loadreports()
-    logging.debug("Load report files returned: " + str(loadreport_list))
-    for loadreport in loadreport_list:
-        if testing == "False":
-            notify_dts_loadreports(loadreport)
+    loadreports = collect_loadreports()
+    logging.debug("Load report files returned: " + str(loadreports))
+    for dropbox in loadreports:
+        load_report_list = loadreports[dropbox]
+        for loadreport in loadreports:
+            if testing == "False":
+                notify_dts_loadreports(loadreport, dropbox)
 
     # Collect failed ingests
-    failed_batch_list = collect_failed_batch()
-    logging.debug("Failed batch files returned: " + str(failed_batch_list))
-    for failed_batch in failed_batch_list:
-        if testing == "False":
-            notify_dts_failed_batch(failed_batch)
+    failed_batches = collect_failed_batch()
+    logging.debug("Failed batch files returned: " + str(failed_batches))
+    for dropbox in failed_batches:
+        failed_batch_list = failed_batches[dropbox]
+        for failed_batch in failed_batch_list:
+            if testing == "False":
+                notify_dts_failed_batch(failed_batch, dropbox)
 
 if __name__ == "__main__":
     try:
