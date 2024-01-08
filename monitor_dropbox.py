@@ -88,7 +88,7 @@ def main():
     logging.debug("Load report files returned: " + str(loadreports))
     for dropbox in loadreports:
         load_report_list = loadreports[dropbox]
-        for loadreport in loadreports:
+        for loadreport in load_report_list:
             if testing == "False":
                 notify_dts_loadreports(loadreport, dropbox)
 
