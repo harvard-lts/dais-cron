@@ -30,7 +30,7 @@ def collect_loadreports():
     loadreports = {}
     for dropbox in dropbox_list:
         loadreport_files = []
-        loadreport_dir = os.path.join(dropbox_root_dir, "lts_load_reports", dropbox, "incoming")
+        loadreport_dir = os.path.join(dropbox_root_dir, dropbox, "incoming")
         logging.debug("Checking for load reports in dropbox loc: " + loadreport_dir)
 
         for root, dirs, files in os.walk(loadreport_dir):
