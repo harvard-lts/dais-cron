@@ -97,9 +97,10 @@ def main():
     logging.debug("Failed batch files returned: " + str(failed_batches))
     for dropbox in failed_batches:
         failed_batch_list = failed_batches[dropbox]
-        for failed_batch in failed_batch_list:
-            if testing == "False":
-                notify_dts_failed_batch(failed_batch, dropbox)
+        logging.debug("Failed batch list: " + str(failed_batch_list))
+        #for failed_batch in failed_batch_list:
+        #    if testing == "False":
+        #        notify_dts_failed_batch(failed_batch, dropbox)
 
 if __name__ == "__main__":
     try:
