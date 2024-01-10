@@ -39,7 +39,7 @@ Cron(interval, {}, ()=> {
 });
 
 //Set cron intervals
-dropbox_second = process.env.DROPBOX_SECOND
+/* dropbox_second = process.env.DROPBOX_SECOND
 dropbox_minute = process.env.DROPBOX_MINUTE
 dropbox_hour = process.env.DROPBOX_HOUR
 dropbox_day = process.env.DROPBOX_DAY
@@ -59,4 +59,4 @@ Cron(dropbox_interval, {}, ()=> {
     console.log(e);
   }
 
-});
+}); */
