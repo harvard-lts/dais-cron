@@ -7,7 +7,7 @@ import re
 import sys
 import traceback
 from datetime import datetime
-
+import time
 from requests import exceptions, get, HTTPError
 
 DATEFORMAT = '%Y-%m-%d %H:%M:%S'
@@ -91,6 +91,7 @@ def main():
         for loadreport in load_report_list:
             if testing == "False":
                 notify_dts_loadreports(loadreport, dropbox)
+                time.sleep(3)
 
     # Collect failed ingests
     failed_batches = collect_failed_batch()
